@@ -1,0 +1,71 @@
+﻿@page "/registroprestamos"
+
+@inject IPrestamoService PrestamoService
+
+<h3>Registrar Préstamo</h3>
+
+<EditForm Model="@nuevoPrestamo" OnValidSubmit="GuardarPrestamo">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Deudor:</label>
+        <InputText @bind-Value="nuevoPrestamo.Deudor" class="form-control" />
+    </div>
+
+    <div>
+        <label>Concepto:</label>
+        <InputText @bind-Value="nuevoPrestamo.Concepto" class="form-control" />
+    </div>
+
+    <div>
+        <label>Monto:</label>
+        <InputNumber @bind-Value="nuevoPrestamo.Monto" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+<hr />
+
+<h3>Lista de Préstamos</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Deudor</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prestamo in prestamos)
+        {
+            <tr>
+                <td>@prestamo.Deudor</td>
+                <td>@prestamo.Concepto</td>
+                <td>@prestamo.Monto</td>
+                <td>@prestamo.FechaRegistro</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private Prestamo nuevoPrestamo = new Prestamo();
+    private List<Prestamo> prestamos = new List<Prestamo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        prestamos = await PrestamoService.ObtenerPrestamos();
+    }
+
+    private async Task GuardarPrestamo()
+    {
+        await PrestamoService.AgregarPrestamo(nuevoPrestamo);
+        prestamos = await PrestamoService.ObtenerPrestamos();
+        nuevoPrestamo = new Prestamo(); 
+    }
+}
+
